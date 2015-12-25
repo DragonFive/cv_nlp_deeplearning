@@ -98,7 +98,7 @@ if __name__=="__main__":
     # print(clusters)
     plt.plot(centers[:,0],centers[:,1],'x')
 
-    biaozhi={0.0:'*',1.0:'x',2.0:'^',3.0:'v',4.0:'*'}
+    biaozhi={0.0:'b*',1.0:'m+',2.0:'rx',3.0:'go',4.0:'y<'}
     for i in range(dataset.shape[0]):
         plt.plot(dataset[i,0],dataset[i,1],biaozhi.get(clusters[i,0]))
 

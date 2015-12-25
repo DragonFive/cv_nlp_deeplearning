@@ -76,12 +76,12 @@ if __name__=="__main__":
     # dist_mat = (dist_mat+dist_mat.T)/2
     #
     # print(dist_mat[1:6,1:6])
-    qinhedu_mat = get_qinhemat(dist_mat,100,10)
+    qinhedu_mat = get_qinhemat(dist_mat,70,35)
 
     qinhedu_mat = (qinhedu_mat+qinhedu_mat.T)/2
 
     norm_lap = get_normal_lapalase(qinhedu_mat)
-    keigval,keigvec=getKSmallestEigVec(norm_lap,20)
+    keigval,keigvec=getKSmallestEigVec(norm_lap,4)
 
     centers , clusters=kMeans(keigvec,2)
 
