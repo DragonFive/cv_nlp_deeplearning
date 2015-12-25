@@ -15,6 +15,8 @@ def newPy(fname):
     myip = Getmyip()
     address = myip.getAddByIp(myip.get_ex_ip()).encode('gbk');
     f.write("# "+address+" dragonfive \n");
+    # 联系方式
+    f.write("# any question mail：dragonfive1992@gmail.com \n");
     # 版权信息
     f.write("# copyright 1992-"+time.strftime(r"%Y")+ " dragonfive \n");
     f.close();
