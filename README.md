@@ -41,20 +41,27 @@
 
 ### 1 tofile
 
-    ``` a.tofile("filename.bin")```
-
-      这种方法只能保存为二进制文件，且不能保存当前数据的行列信息，文件后缀不一定非要是bin，也可以为txt，但不影响保存格式，都是二进制。
+``` 
+a.tofile("filename.bin")
+```
+这种方法只能保存为二进制文件，且不能保存当前数据的行列信息，文件后缀不一定非要是bin，也可以为txt，但不影响保存格式，都是二进制。
 
 
 
 
 这种保存方法对数据读取有要求，需要手动指定读出来的数据的的dtype，如果指定的格式与保存时的不一致，则读出来的就是错误的数据。
 
-       ```b = numpy.fromfile("filename.bin",dtype = **)```
 
-       读出来的数据是一维数组，需要利用
+```
+b = numpy.fromfile("filename.bin",dtype = **)
+```
 
-        ```b.shape = 3,4```重新指定维数。
+读出来的数据是一维数组，需要利用
+
+ ```
+ b.shape = 3,4
+ ```
+ 重新指定维数。
 
 ### 2 save
 
@@ -76,12 +83,11 @@ numpy.save("filename.npy",a)
 
 ###   3.savetxt
 
-```numpy.savetxt("filename.txt",a)
+```
+numpy.savetxt("filename.txt",a)
 
 
-
-
-      b =  numpy.loadtxt("filename.txt")
+b =  numpy.loadtxt("filename.txt")
 
 ```
 
