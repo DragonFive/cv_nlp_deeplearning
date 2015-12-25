@@ -88,18 +88,18 @@ def kMeans(dataSet,num_of_centers):
 
 
 
+if __name__=="__main__":
 
+    # generage_randomdata()
+    # print()
+    dataset = np.loadtxt('gaussData.txt')
+    centers , clusters=kMeans(dataset,5)
+    # print(centers)
+    # print(clusters)
+    plt.plot(centers[:,0],centers[:,1],'x')
 
-# generage_randomdata()
-# print()
-dataset = np.loadtxt('gaussData.txt')
-centers , clusters=kMeans(dataset,5)
-# print(centers)
-# print(clusters)
-plt.plot(centers[:,0],centers[:,1],'x')
+    biaozhi={0.0:'*',1.0:'x',2.0:'^',3.0:'v',4.0:'*'}
+    for i in range(dataset.shape[0]):
+        plt.plot(dataset[i,0],dataset[i,1],biaozhi.get(clusters[i,0]))
 
-biaozhi={0.0:'*',1.0:'v',2.0:'^',3.0:'x',4.0:'*'}
-for i in range(dataset.shape[0]):
-    plt.plot(dataset[i,0],dataset[i,1],biaozhi.get(clusters[i,0]))
-
-plt.show()
+    plt.show()
