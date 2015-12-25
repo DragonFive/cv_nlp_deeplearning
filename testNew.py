@@ -2,8 +2,8 @@
 #__author__ = 'dragon'
 
 from myTools import Getmyip,newPy
-from 07gauss2dim import dist_eclud,initial_center,kMeans
-import random,numpy as np,networkx as nx
+from p07gauss2dim import initial_center,kMeans
+import random,numpy as np,networkx as nx,matplotlib.pyplot as plt
 
 
 
@@ -12,21 +12,6 @@ import random,numpy as np,networkx as nx
 # 先计算空间点的欧式距离
 def dist_eclud(pointA,pointB):
     return np.sqrt(sum(np.power(pointA-pointB,2)))
-
-
-
-
-# 首先读取原始数据
-samples = np.loadtxt('sample.txt')
-# print(samples)
-# print(np.shape(samples))
-
-# 建立邻接矩阵
-num_point = np.shape(samples)[0]
-dist_mat = np.mat(np.zeros((num_point,num_point)))
-# 计算每个点与其他所有点的距离
-for index_pointA in range(num_point):
-    dist_mat[index_pointA,:]=[dist_eclud(samples[index_pointA],pointB) for pointB in samples]
 
 # 根据阈值设置返回值，大于阈值为0，小于阈值计算亲和度
 def compute_qinhedu(dis,threshold,sigma):
@@ -41,10 +26,10 @@ def get_qinhemat(dist_mat,k,sigma):
     qinhedu_mat = np.mat(np.zeros((num_point,num_point)))
     for index_dist in range(num_point):
         # 先找到第k小的距离;先从小到大排序找到第k个值
-        temp_vector=dist_mat[index_dist]
-        threshold_value = temp_vector.sort()[k]
+        temp_vector=dist_mat[index_dist,:]
+        threshold_value = np.sort(temp_vector)[0,k]
         # 比阈值大的都设置为0;与自己的亲和度设为0;计算前k个的亲和度
-        qinhedu_mat[index_dist]=np.mat([ compute_qinhedu(dist_pointi,threshold_value,sigma) for dist_pointi in dist_mat[index_dist]])
+        qinhedu_mat[index_dist]=np.mat([ compute_qinhedu(dist_mat[index_dist,dist_pointi],threshold_value,sigma) for dist_pointi in range(num_point)])
 
     return qinhedu_mat
 
@@ -52,11 +37,11 @@ def get_qinhemat(dist_mat,k,sigma):
 def get_normal_lapalase(qinhedu_mat):
     # 首先获得度向量
     num_point = np.shape(qinhedu_mat)[0]
-    du_vec = [sum(dist_vec) for dist_vec in qinhedu_mat]
+    du_vec = [np.sum(dist_vec) for dist_vec in qinhedu_mat]
     du_mat = np.diag(du_vec)
     laplase_mat = dist_mat - qinhedu_mat
     #dn=du_mat^(-1/2)
-    dn = np.power(np.linalg.matrix_power(du_mat,-1),0.5) # 里面的求逆？
+    dn = np.power(np.linalg.matrix_power(du_mat,-1),0.5) # 里面的求逆？dist_mat
     normal_lap = np.dot(np.dot(dn,laplase_mat),dn)
     return normal_lap
 
@@ -73,8 +58,48 @@ def getKSmallestEigVec(normal_lap,k):
 	dictEigval=dict(zip(eigval,range(0,dim)))
 	kEig=np.sort(eigval)[0:k]
 	ix=[dictEigval[k] for k in kEig]
-	return eigval[ix],eigvec[:,ix]
+	return eigval[ix],eigvec[:,ix]   # 特征向量是按列存放的
+
+if __name__=="__main__":
+
+    # 首先读取原始数据
+    samples = np.loadtxt('sample.txt')
+    # print(samples)
+    # print(np.shape(samples))
+
+    # 建立邻接矩阵
+    num_point = np.shape(samples)[0]
+    dist_mat = np.mat(np.zeros((num_point,num_point)))
+    # 计算每个点与其他所有点的距离
+    for index_pointA in range(num_point):
+        dist_mat[index_pointA,:]=[dist_eclud(samples[index_pointA],pointB) for pointB in samples]
+    # print(dist_mat[1:6,1:6])
+    # dist_mat = (dist_mat+dist_mat.T)/2
+    #
+    # print(dist_mat[1:6,1:6])
+    qinhedu_mat = get_qinhemat(dist_mat,100,10)
+
+    qinhedu_mat = (qinhedu_mat+qinhedu_mat.T)/2
+
+    norm_lap = get_normal_lapalase(qinhedu_mat)
+    keigval,keigvec=getKSmallestEigVec(norm_lap,20)
+
+    centers , clusters=kMeans(keigvec,2)
 
 
+    biaozhi={0.0:'cx--',1.0:'mo:'}
+    for i in range(samples.shape[0]):
+        plt.plot(samples[i,0],samples[i,1],biaozhi.get(clusters[i,0]))
+
+    plt.show()
 
 
+    # clusterA=[i for i in range(0,num_point) if keigvec[i,0]>0] #属于第一类的下标集合
+    # clusterB=[i for i in range(0,num_point) if keigvec[i,0]<0]
+    # print(keigvec[:,0])
+    # print(keigvec[:,1])
+    #
+    # plt.plot(samples[clusterA,0],samples[clusterA,1],'*')
+    # plt.plot(samples[clusterB,0],samples[clusterB,1],'x')
+    # plt.axis('equal')
+    # plt.show()
