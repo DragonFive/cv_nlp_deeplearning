@@ -21,7 +21,7 @@ def compute_qinhedu(dis,threshold,sigma):
 
 #找到每一个行的前k个计算亲和度，其它的赋值为0,返回亲和度矩阵
 def get_qinhemat(dist_mat,k,sigma):
-    num_point = np.shape(samples)[0]
+    num_point = np.shape(dist_mat)[0]
     qinhedu_mat = np.mat(np.zeros((num_point,num_point)))
     for index_dist in range(num_point):
         # 先找到第k小的距离;先从小到大排序找到第k个值
