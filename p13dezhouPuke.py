@@ -16,7 +16,7 @@ def getPointAndColor(num):
     return np.array(pAndC,myDtype)
 
 
-# 得分规则是
+# 得分规则是http://news.tongbu.com/44701.html
 # 1.皇家同花顺
 # 2.同花顺
 # 3.四条
@@ -132,5 +132,5 @@ if __name__ == '__main__':
     playerA = getPointAndColor(5)
     playerB = getPointAndColor(5)
     print(playerA,playerB,comparePlayer(playerA,playerB))
-    # 下面获得各自牌的分数;
+
 
