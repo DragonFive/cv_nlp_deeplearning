@@ -41,16 +41,12 @@ class Getmyip:
     def get_ex_ip(self):
         try:
             myip = self.visit("http://www.whereismyip.com/")
-            return myip
         except:
             try:
-                myip = self.visit("http://www.bliao.com/ip.phtml")
+                myip = self.visit("http://www.ip138.com/ip2city.asp")
             except:
-                try:
-                    myip = self.visit("http://www.ip138.com/ip2city.asp")
-                except:
-                    myip = "So sorry!!!"
-                    return myip
+                myip = "So sorry!!!"
+        return myip
 
     def visit(self,url):
         opener = urllib2.urlopen(url)
@@ -58,7 +54,7 @@ class Getmyip:
         if url == ourl:
             str = opener.read()
             asd=re.search('\d+\.\d+\.\d+\.\d+',str).group(0)
-            return asd
+        return asd
 
     # 获取一个ip的区域地址，用百度ipstore的工具;
     def getAddByIp(self,ipaddr):#这里可以用多参数进行优化；
