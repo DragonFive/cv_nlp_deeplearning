@@ -9,8 +9,9 @@
 import random as rd
 import numpy as np
 def getPointAndColor(num):
-    points = np.sort(rd.sample(range(1,13)*4,num))[::-1] # 每张牌只出现一次
-    colors = [rd.choice('brmf') for i in range(num)]  # 每个牌有一个花色
+    cards = rd.sample(range(1,53),num);
+    points = np.sort([i%13+1 for i in cards])[::-1] # 每张牌只出现一次
+    colors = ['brmf'[(i-1)/13] for i in cards]  # 每个牌有一个花色
     myDtype = [('point',int),('color',str,1)]
     pAndC = [tuple((points[i],colors[i])) for i in range(num)]
     return np.array(pAndC,myDtype)
