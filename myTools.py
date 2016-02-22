@@ -69,5 +69,12 @@ class Getmyip:
             address=content["data"]["country"]+":"+content["data"]["city"]+":"+content["data"]["operator"]
             return address;
 
+def is_huiwenshu(n):
+    return n==int(''.join(list(reversed(str(n)))))
 
+
+def get_huiwenshu():
+    it=range(100,1000)
+    it = filter(is_huiwenshu,it)
+    print([i for i in it if i<1000])
 
