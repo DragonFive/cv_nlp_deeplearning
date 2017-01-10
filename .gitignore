@@ -1,2 +1,6 @@
 #过滤掉图片等
 *.png
+ML_in_action/.ipynb_checkpoints/
+*.pyc
+*.DS_Store
+
