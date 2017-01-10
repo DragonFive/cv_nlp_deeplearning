@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#__author__ = 'DragonFive'
 # import the necessary packages
 import numpy as np
 import cv2
@@ -43,13 +45,13 @@ class ColorDescriptor:
 
 		# extract a color histogram from the elliptical region and
 		# update the feature vector
-		hist = self.histogram(image, ellipMask)
+		hist = self.histogram(image, ellipMask, True)
 		features.extend(hist)
 
 		# return the feature vector
 		return features
 
-	def histogram(self, image, mask):
+	def histogram(self, image, mask, isCenter = False):
 		# extract a 3D color histogram from the masked region of the
 		# image, using the supplied number of bins per channel; then
 		# normalize the histogram
@@ -57,6 +59,10 @@ class ColorDescriptor:
 		hist = cv2.calcHist([image], [0, 1, 2], mask, self.bins,
 		    [0, 180, 0, 256, 0, 256])
 		hist = cv2.normalize(hist).flatten()
-	 
+	 	# 处理中心处，让它权重大一点
+		if isCenter:
+			weight = 5.0
+			
 		# return the histogram
 		return hist
+
