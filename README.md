@@ -10,3 +10,6 @@
 
 [data_analyse](https://github.com/DragonFive/python_cv_AI_ML/tree/master/data_analyse):用python做数据分析
 
+
+[mxnet-gluon](https://github.com/DragonFive/python_cv_AI_ML/tree/master/mxnet):使用mxnet的gluon接口实现神经网络
+
