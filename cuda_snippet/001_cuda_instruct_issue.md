@@ -1,3 +1,14 @@
+## 指令提交
+
+指令被 CPU 组装好后，先放到 software queue 里（CUDA stream），其中的 "copy operation" 被分拣到 CE queue，而 "kernel launch" 被分拣到 EE queue，最后分别被 GPU 的 CE (Copy Engine) 和 EE (Execution Engine) 处理。
+
+举个简单的示例，NVIDIA 的 Fermi 架构（纪念物理学家费米）有 1 个 EE queue，2 个 CE queue，其中一个 CE 用于 Host 向 Device 方向的 DMA 拷贝（H2D），另一个 CE 用于 Host 向 Device 方向的 DMA 拷贝（D2H）。
+
+RM (Direct Rendering Manager)，它是一个专为 GPU 内存管理和调度设计的模块，被 AMD, Nvidia 等 GPU 的 Linux 驱动程序广泛使用。
+
+在 DRM 中，CPU 的封装指令以 "job" 的形式存在，在 GPU 中以 "task" 的形式存在。job 是有优先级的，所以一个 HW queue 应该对应多个不同优先级的 runqueue（由结构体 "drm_gpu_rq" 表示），然后由一个内核线程作为 scheduler（由结构体 "drm_gpu_scheduler" 表示），按照优先级去循环遍历，选取 job。
+
+
 
 ## 指令发射
 同一个block的warp只能在同一个SM上运行，但是同一SM可以可以容纳来自不同block甚至不同grid的若干个warp。
