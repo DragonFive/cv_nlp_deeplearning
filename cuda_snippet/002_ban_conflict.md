@@ -1,0 +1,3 @@
+Cuda shared memory按照4字节一个bank，总共32个bank（128字节）来组织，其store和load操作在一定情况下存在bank conflict的情况,
+bank conflict会导致warp被stall，冲突较多会对整个pipeline的耗时会有较大的影响。
+当发生bank conflict时，warp需要额外的一个cycle来重新提交shared memory的访问指令到LSU单元，该指令需要在MIO中排队，这种排队会导致访问延迟增加，此时warp可能处于等待数据返回的状态，warp state标识为Stall Short Scoreboard。如果MIO队列满，此时warp先需要等待MIO队列处于非空的状态，此时warp state标识为Stall MIO Throttle。
