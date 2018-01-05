@@ -12,3 +12,5 @@ warp是SM的基本执行单元，一个block内相邻的32个线程划分为一�
 padding的缺点有：
 - 可能降低SM的occupancy。由于每个SM的可使用的shared memory有限，如果每个block使用的共享内存增加，则SM内最大可并发的block数目减少，导致资源不能被充分利用，一些计算资源被闲置。
 - 地址访问对齐问题。需要仔细考虑padding的大小来避免地址不对齐的问题，比如访问shared memory时可能是向量化的访问，比如int4访问，也就是每次访问4个int，即16字节，那每次访问的地址必须是16字节对齐的。
+
+swizzling是在不额外分配内存的情况下，通过将shared memory的数据进行重排来避免bank conflict。
