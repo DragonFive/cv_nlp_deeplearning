@@ -3,6 +3,8 @@ project(reduce_benchmark CUDA)
 
 set(CMAKE_CUDA_STANDARD 11)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+# 添加 CUB 头文件路径（CUB 已包含在 CUDA Toolkit 中）
+include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 
 add_executable(reduce_benchmark reduce_sum.cu)
 set_target_properties(reduce_benchmark PROPERTIES CUDA_ARCHITECTURES "75")  # 根据你的GPU调整

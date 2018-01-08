@@ -1,5 +1,6 @@
 #include <cuda_runtime.h>
 #include <stdio.h>
+#include <cub/cub.cuh> 
 
 #define THREAD_PER_BLOCK 256
 #define NUM_ELEMENTS (32 * 1024 * 1024)  // 32M elements
@@ -26,9 +27,29 @@ __global__ void reduce0(float *d_in,float *d_out){
     if(tid==0)d_out[blockIdx.x]=sdata[tid];
 }
 
+// 使用 CUB 实现的 reduce sum
+void cub_reduce_sum(float *d_in, float *d_out, int num_elements) {
+    void     *d_temp_storage = NULL;
+    size_t   temp_storage_bytes = 0;
+    
+    // 第一次调用获取临时存储大小
+    cub::DeviceReduce::Sum(d_temp_storage, temp_storage_bytes, 
+                          d_in, d_out, num_elements);
+    
+    // 分配临时存储
+    cudaMalloc(&d_temp_storage, temp_storage_bytes);
+    
+    // 执行规约操作
+    cub::DeviceReduce::Sum(d_temp_storage, temp_storage_bytes, 
+                          d_in, d_out, num_elements);
+                          
+    // 清理
+    cudaFree(d_temp_storage);
+}
+
 // CPU版本的reduce sum用于验证结果
-float cpu_sum(float *arr, int n) {
-    float sum = 0;
+double cpu_sum(float *arr, int n) {
+    double sum = 0;
     for(int i = 0; i < n; i++) {
         sum += arr[i];
     }
@@ -87,18 +108,57 @@ int main() {
     for(int i = 0; i < num_blocks; i++) {
         gpu_sum += h_out[i];
     }
+    // 测试 CUB 实现
+    float *d_cub_out;
+    cudaMalloc(&d_cub_out, sizeof(float));
     
+    cudaEvent_t start2, stop2;
+    cudaEventCreate(&start2);
+    cudaEventCreate(&stop2);
+    
+    cudaEventRecord(start2);
+    cub_reduce_sum(d_in, d_cub_out, NUM_ELEMENTS);
+    cudaEventRecord(stop2);
+    cudaEventSynchronize(stop2);
+    
+    float milliseconds2 = 0;
+    cudaEventElapsedTime(&milliseconds2, start2, stop2);
+    
+    // 获取 CUB 结果
+    float gpu_sum2;
+    cudaMemcpy(&gpu_sum2, d_cub_out, sizeof(float), cudaMemcpyDeviceToHost);
     // CPU版本计算结果用于验证
-    float cpu_result = cpu_sum(h_in, NUM_ELEMENTS);
+    // 测量 CPU 计算时间
+    cudaEvent_t start3, stop3;
+    cudaEventCreate(&start3);
+    cudaEventCreate(&stop3);
     
+    cudaEventRecord(start3);
+    float cpu_result = float(cpu_sum(h_in, NUM_ELEMENTS));
+    cudaEventRecord(stop3);
+    cudaEventSynchronize(stop3);
+    
+    float milliseconds3 = 0;
+    cudaEventElapsedTime(&milliseconds3, start3, stop3);
     // 输出结果
-    printf("GPU计算结果: %.0f\n", gpu_sum);
+    printf("reduce0 kernel计算结果: %.0f\n", gpu_sum);
+    printf("CUB实现结果: %.0f\n", gpu_sum2);
     printf("CPU计算结果: %.0f\n", cpu_result);
-    printf("Kernel执行时间: %.3f ms\n", milliseconds);
-    printf("带宽: %.2f GB/s\n", 
+    printf("reduce0 Kernel执行时间: %.3f ms\n", milliseconds);
+    printf("CUB实现时间: %.3f ms\n", milliseconds2);
+    printf("CPU执行时间: %.3f ms\n", milliseconds3);
+    printf("reduce0 kernel带宽: %.2f GB/s\n", 
            (NUM_ELEMENTS * sizeof(float)) / (milliseconds * 1000000));
+    printf("CUB实现带宽: %.2f GB/s\n", 
+            (NUM_ELEMENTS * sizeof(float)) / (milliseconds2 * 1000000));
     
     // 清理
+    // 清理额外的资源
+    cudaFree(d_cub_out);
+    cudaEventDestroy(start2);
+    cudaEventDestroy(stop2);
+    cudaEventDestroy(start3);
+    cudaEventDestroy(stop3);
     cudaFree(d_in);
     cudaFree(d_out);
     cudaEventDestroy(start);
