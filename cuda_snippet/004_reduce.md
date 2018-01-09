@@ -107,3 +107,4 @@ Shuffle指令是一组针对warp的指令。Shuffle指令最重要的特性就�
 3. 提高 warp 内数据交换效率
 4. 减少内存带宽压力
 
+warp shuffle 适合二维block结构
