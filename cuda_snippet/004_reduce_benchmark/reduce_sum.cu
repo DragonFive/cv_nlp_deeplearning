@@ -48,6 +48,37 @@ __global__ void reduce1(float *d_in,float *d_out){
     if (tid == 0) d_out[blockIdx.x] = sdata[0];
 }
 
+__device__ void warpReduce(volatile float* cache,int tid){
+    cache[tid]+=cache[tid+32];
+    cache[tid]+=cache[tid+16];
+    cache[tid]+=cache[tid+8];
+    cache[tid]+=cache[tid+4];
+    cache[tid]+=cache[tid+2];
+    cache[tid]+=cache[tid+1];
+}
+
+__global__ void reduce2(float *d_in,float *d_out){
+    __shared__ float sdata[THREAD_PER_BLOCK];
+
+    //each thread loads one element from global memory to shared mem
+    unsigned int i=blockIdx.x*(blockDim.x*2)+threadIdx.x;
+    unsigned int tid=threadIdx.x;
+    sdata[tid]=d_in[i] + d_in[i+blockDim.x];
+    __syncthreads();
+
+    // do reduction in shared mem
+    for(unsigned int s=blockDim.x/2; s>32; s>>=1){
+        if(tid < s){
+            sdata[tid]+=sdata[tid+s];
+        }
+        __syncthreads();
+    }
+    
+    // write result for this block to global mem
+    if(tid<32)warpReduce(sdata,tid);
+    if(tid==0)d_out[blockIdx.x]=sdata[tid];
+}
+
 // 使用 CUB 实现的 reduce sum
 void cub_reduce_sum(float *d_in, float *d_out, int num_elements) {
     void     *d_temp_storage = NULL;
