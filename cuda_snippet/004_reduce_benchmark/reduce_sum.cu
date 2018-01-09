@@ -27,7 +27,7 @@ __global__ void reduce0(float *d_in,float *d_out){
     if(tid==0)d_out[blockIdx.x]=sdata[tid];
 }
 
-__global__ void reduce2(float *d_in,float *d_out){
+__global__ void reduce1(float *d_in,float *d_out){
     __shared__ float sdata[THREAD_PER_BLOCK];
 
     // each thread loads one element from global to shared mem
