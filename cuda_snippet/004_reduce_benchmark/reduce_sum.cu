@@ -27,6 +27,27 @@ __global__ void reduce0(float *d_in,float *d_out){
     if(tid==0)d_out[blockIdx.x]=sdata[tid];
 }
 
+__global__ void reduce2(float *d_in,float *d_out){
+    __shared__ float sdata[THREAD_PER_BLOCK];
+
+    // each thread loads one element from global to shared mem
+    unsigned int tid = threadIdx.x;
+    unsigned int i = blockIdx.x*blockDim.x + threadIdx.x;
+    sdata[tid] = d_in[i];
+    __syncthreads();
+
+    // do reduction in shared mem
+    for (unsigned int s=blockDim.x>>1; s>0; s>>=1) {
+        if (tid < s) {
+            sdata[tid] += sdata[tid + s];
+        }
+        __syncthreads();
+    }
+
+    // write result for this block to global mem
+    if (tid == 0) d_out[blockIdx.x] = sdata[0];
+}
+
 // 使用 CUB 实现的 reduce sum
 void cub_reduce_sum(float *d_in, float *d_out, int num_elements) {
     void     *d_temp_storage = NULL;
