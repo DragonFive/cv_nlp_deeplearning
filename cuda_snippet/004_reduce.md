@@ -33,6 +33,6 @@ __global__ void reduce0(float *d_in,float *d_out){
 }
 ```
 
-NV GPU中整型除法和取模的计算成本很高，在索引计算部分，采用多维线程配置的方法，相对于1维线程配置，中间利用stride除法、取模计算index，性能会有提升。
+这个代码里会有warp divergence的问题，share memory 也会bank conflict。
 
 
