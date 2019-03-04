@@ -8,6 +8,8 @@
 
 [my_deep_learning_lib](https://github.com/DragonFive/python_cv_AI_ML/tree/master/my_deep_learning_lib):用python实现的部分深度学习的功能性代码
 
+[cuda_snippet](https://github.com/DragonFive/cv_nlp_deeplearning/tree/master/cuda_snippet): 用cuda做深度学习的一些算法
+
 [data_analyse](https://github.com/DragonFive/python_cv_AI_ML/tree/master/data_analyse):用python做数据分析
 
 
