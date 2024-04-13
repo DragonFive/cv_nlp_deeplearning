@@ -1,0 +1,14 @@
+NVCC = nvcc
+COMPUTE_CAP := $(shell nvidia-smi --query-gpu=compute_cap --format=csv,noheader | head -n 1 | tr -d '.' || echo "75")
+NVCC_FLAGS = -O3 -arch=sm_$(COMPUTE_CAP)
+
+TARGET = transpose
+SRCS = transpose.cu
+
+$(TARGET): $(SRCS)
+	@echo "use GPU arch: sm_$(COMPUTE_CAP)"
+	$(NVCC) $(NVCC_FLAGS) -o $@ $^
+
+.PHONY: clean
+clean:
+	rm -f $(TARGET)
