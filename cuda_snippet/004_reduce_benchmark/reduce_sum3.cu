@@ -120,14 +120,10 @@ int main(){
     cudaMemcpy(d_a,a,N*sizeof(float),cudaMemcpyHostToDevice);
 
     dim3 Grid( block_num, 1);
-    dim3 Block( THREAD_PER_BLOCK, 1);
+    
 
     CudaTimer timer;
     timer.start();
-    int iter = 2000;
-    for(int i=0; i<iter; i++){
-        reduce3<THREAD_PER_BLOCK, NUM_PER_THREAD><<<Grid,Block>>>(d_a, d_out, N);
-    }
     /*
     dim3 Block( THREAD_PER_BLOCK, 1);
     int iter = 2000;
@@ -135,6 +131,12 @@ int main(){
         reduce3<THREAD_PER_BLOCK, NUM_PER_THREAD><<<Grid,Block>>>(d_a, d_out, N);
     }
     */
+    dim3 Block( THREAD_PER_BLOCK >> 5, 32);
+    int iter = 2000;
+    for(int i=0; i<iter; i++){
+        reduce4<THREAD_PER_BLOCK, NUM_PER_THREAD><<<Grid,Block>>>(d_a, d_out, N);
+    }
+    
     timer.stop();
     printf("reduce3 cost time: %lf ms\n", timer.elapsed() / iter);
     cudaMemcpy(out,d_out,block_num*sizeof(float),cudaMemcpyDeviceToHost);
