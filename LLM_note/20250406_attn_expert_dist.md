@@ -17,6 +17,8 @@
 
 ## XBAR, nvlink, nvswitch
 
+[扩展阅读-大模型训练的通信问题与目前的解决方案图解](https://zhuanlan.zhihu.com/p/660599727)
+
 XBAR 是在一张gpu内部交换，nvlink是gpu之间交换数据，nvswitch 是不同机器的gpu之间交换，nvlink可以通过xbar 可以在不同gpu的不同模块之间交换
 
 
